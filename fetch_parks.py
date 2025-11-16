@@ -68,8 +68,10 @@ def main():
             # Sicherstellen, dass keine None-Werte in die CSV kommen
             free_spaces = free_spaces or ""
             occupancy = occupancy or ""
-            place_url = f"[Karte]({google_maps_place_link(lat_f, lng_f)})" if lat_f and lng_f else ""
-            directions_url = f"[Anfahrt]({google_maps_directions_link(lat_f, lng_f)})" if lat_f and lng_f else ""
+
+            # HTML-Links mit Parkplatznamen
+            place_url = f'<a href="{google_maps_place_link(lat_f, lng_f)}">Standort {name}</a>' if lat_f and lng_f else ""
+            directions_url = f'<a href="{google_maps_directions_link(lat_f, lng_f)}">Anfahrt {name}</a>' if lat_f and lng_f else ""
 
             rows.append({
                 "Parkplatz": name,
