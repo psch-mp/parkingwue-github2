@@ -2,8 +2,8 @@ name: Update Parkplaetze CSV
 
 on:
   schedule:
-    # alle 15 Minuten (GitHub Actions Cron verwendet UTC). Du kannst das anpassen.
-    #- cron: '*/15 * * * *'
+    # alle 3 Minuten (GitHub Actions Cron verwendet UTC). Du kannst das anpassen.
+    - cron: '*/3 * * * *'
   workflow_dispatch:  # erlaubt manuelles Auslösen im Actions-Tab
 
 jobs:
