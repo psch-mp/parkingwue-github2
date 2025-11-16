@@ -13,7 +13,7 @@ OUTPUT_CSV = "Parkplaetze.csv"
 def clean_name(name: str) -> str:
     """Entfernt PP, PH, DH und 'Würzburg' aus dem Namen"""
     if not isinstance(name, str):
-        return name
+        return ""
     name = re.sub(r'\b(PP|PH|DH)\.?\b', '', name, flags=re.IGNORECASE)
     name = re.sub(r'\bW[üu]rzburg\b', '', name, flags=re.IGNORECASE)
     name = re.sub(r'[-/]+', ' ', name)
@@ -23,10 +23,10 @@ def clean_name(name: str) -> str:
 def extract_from_ci(ci_html: str):
     """Extrahiert freie Plätze und Auslastung aus dem HTML-String"""
     if not isinstance(ci_html, str):
-        return (None, None)
+        return ("", "")
     bolds = re.findall(r'<b>(.*?)</b>', ci_html, flags=re.IGNORECASE)
-    free_spaces = bolds[0].strip() if len(bolds) >= 1 else None
-    occupancy = bolds[1].strip() if len(bolds) >= 2 else None
+    free_spaces = bolds[0].strip() if len(bolds) >= 1 else ""
+    occupancy = bolds[1].strip() if len(bolds) >= 2 else ""
     return (free_spaces, occupancy)
 
 def google_maps_place_link(lat, lng):
@@ -46,8 +46,8 @@ def main():
 
     rows = []
     cats = data.get("cats") or []
-    jetzt = datetime.now()  # aktuelle Zeit
-    zeit_str = jetzt.strftime("%d.%m.%y %H:%M")  # Format dd.mm.yy hh:mm
+    jetzt = datetime.now()
+    zeit_str = jetzt.strftime("%d.%m.%y %H:%M")
 
     for category in cats:
         for p in category.get("p", []):
@@ -65,9 +65,11 @@ def main():
             ci = p.get("ci", "")
             free_spaces, occupancy = extract_from_ci(ci)
 
-            # Markdown-Links für Datawrapper
-            place_url = f"[Karte]({google_maps_place_link(lat_f, lng_f)})" if lat_f and lng_f else None
-            directions_url = f"[Anfahrt]({google_maps_directions_link(lat_f, lng_f)})" if lat_f and lng_f else None
+            # Sicherstellen, dass keine None-Werte in die CSV kommen
+            free_spaces = free_spaces or ""
+            occupancy = occupancy or ""
+            place_url = f"[Karte]({google_maps_place_link(lat_f, lng_f)})" if lat_f and lng_f else ""
+            directions_url = f"[Anfahrt]({google_maps_directions_link(lat_f, lng_f)})" if lat_f and lng_f else ""
 
             rows.append({
                 "Parkplatz": name,
