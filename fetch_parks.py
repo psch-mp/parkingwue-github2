@@ -6,6 +6,7 @@ import re
 import requests
 import pandas as pd
 from datetime import datetime
+from zoneinfo import ZoneInfo  # Ab Python 3.9
 
 API_URL = "https://geostadtplan.wuerzburg.de/services/getData.php?client=207&catid=39368&lang=de&admin_mode=false"
 OUTPUT_CSV = "Parkplaetze.csv"
@@ -55,7 +56,7 @@ def main():
 
     rows = []
     cats = data.get("cats") or []
-    jetzt = datetime.now()
+    jetzt = datetime.now(ZoneInfo("Europe/Berlin"))  # Zeitzone explizit setzen
     zeit_str = jetzt.strftime("%d.%m.%y %H:%M")
 
     for category in cats:
