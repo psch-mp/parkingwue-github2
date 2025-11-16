@@ -65,8 +65,9 @@ def main():
             ci = p.get("ci", "")
             free_spaces, occupancy = extract_from_ci(ci)
 
-            place_url = google_maps_place_link(lat_f, lng_f) if lat_f and lng_f else None
-            directions_url = google_maps_directions_link(lat_f, lng_f) if lat_f and lng_f else None
+            # Markdown-Links für Datawrapper
+            place_url = f"[Karte]({google_maps_place_link(lat_f, lng_f)})" if lat_f and lng_f else None
+            directions_url = f"[Anfahrt]({google_maps_directions_link(lat_f, lng_f)})" if lat_f and lng_f else None
 
             rows.append({
                 "Parkplatz": name,
