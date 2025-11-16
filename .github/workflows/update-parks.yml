@@ -1,0 +1,45 @@
+name: Update Parkplaetze CSV
+
+on:
+  schedule:
+    # alle 15 Minuten (GitHub Actions Cron verwendet UTC). Du kannst das anpassen.
+    - cron: '*/15 * * * *'
+  workflow_dispatch:  # erlaubt manuelles Auslösen im Actions-Tab
+
+jobs:
+  update-csv:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run fetch_parks.py
+        run: |
+          python fetch_parks.py
+
+      - name: Commit CSV if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Zeige git status zur Diagnose
+          git status --porcelain
+          git add Parkplaetze.csv || true
+          # Prüfe, ob es Änderungen gibt
+          if ! git diff --cached --quiet; then
+            git commit -m "Automatische Aktualisierung Parkplaetze.csv: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            git push origin HEAD:main
+          else
+            echo "Keine Änderungen an Parkplaetze.csv"
+          fi
