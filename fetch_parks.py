@@ -29,6 +29,15 @@ def extract_from_ci(ci_html: str):
     occupancy = bolds[1].strip() if len(bolds) >= 2 else ""
     return (free_spaces, occupancy)
 
+def extract_capacity(desc_html: str) -> str:
+    """Extrahiert die Stellplätze aus dem HTML-String desc"""
+    if not isinstance(desc_html, str):
+        return ""
+    match = re.search(r'<b>Stellpl[^<]*:</b>\s*(\d+)', desc_html, flags=re.IGNORECASE)
+    if match:
+        return match.group(1)
+    return ""
+
 def google_maps_place_link(lat, lng):
     return f"https://www.google.com/maps/search/?api=1&query={lat},{lng}"
 
@@ -65,9 +74,13 @@ def main():
             ci = p.get("ci", "")
             free_spaces, occupancy = extract_from_ci(ci)
 
+            desc = p.get("desc", "")
+            capacity = extract_capacity(desc)  # Stellplätze aus desc
+
             # Sicherstellen, dass keine None-Werte in die CSV kommen
             free_spaces = free_spaces or ""
             occupancy = occupancy or ""
+            capacity = capacity or ""
 
             # HTML-Links mit Parkplatznamen
             place_url = f'<a href="{google_maps_place_link(lat_f, lng_f)}">Standort {name}</a>' if lat_f and lng_f else ""
@@ -75,6 +88,7 @@ def main():
 
             rows.append({
                 "Parkplatz": name,
+                "Stellplätze insgesamt": capacity,
                 "Freie Plätze": free_spaces,
                 "Auslastung in %": occupancy,
                 "Karte": place_url,
